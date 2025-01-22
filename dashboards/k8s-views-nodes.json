@@ -157,7 +157,7 @@
             "uid": "${datasource}"
           },
           "exemplar": false,
-          "expr": "avg(sum by (cpu) (rate(node_cpu_seconds_total{mode!~\"idle|iowait|steal\", instance=\"$instance\", cluster=\"$cluster\"}[$__rate_interval])))",
+          "expr": "avg(sum(rate(k8s_node_cpu_time_seconds_total{k8s_cluster_name=\"$cluster_name\", k8s_node_name=\"$node_name\"}[$__rate_interval])))",
           "instant": true,
           "interval": "$resolution",
           "legendFormat": "",
@@ -230,7 +230,7 @@
             "uid": "${datasource}"
           },
           "exemplar": false,
-          "expr": "sum(node_memory_MemTotal_bytes{instance=\"$instance\", cluster=\"$cluster\"} - node_memory_MemAvailable_bytes{instance=\"$instance\", cluster=\"$cluster\"}) / sum(node_memory_MemTotal_bytes{instance=\"$instance\", cluster=\"$cluster\"})",
+          "expr": "sum(system_memory_usage_bytes{k8s_cluster_name=\"$cluster_name\",k8s_node_name=\"$node_name\", state!~\"free|slab_reclaimable\"}) / sum(system_memory_usage_bytes{k8s_cluster_name=\"$cluster_name\",k8s_node_name=\"$node_name\"})",
           "instant": true,
           "interval": "$resolution",
           "legendFormat": "",
@@ -294,7 +294,7 @@
             "uid": "${datasource}"
           },
           "exemplar": true,
-          "expr": "sum(kube_pod_info{node=\"$node\", cluster=\"$cluster\"})",
+          "expr": "sum(k8s_pod_phase{k8s_cluster_name=\"$cluster_name\", k8s_node_name=\"$node_name\"})",
           "interval": "",
           "legendFormat": "",
           "refId": "A"
@@ -433,7 +433,7 @@
             "uid": "${datasource}"
           },
           "exemplar": true,
-          "expr": "kube_pod_info{node=\"$node\", cluster=\"$cluster\"}",
+          "expr": "k8s_pod_phase{k8s_cluster_name=\"$cluster_name\", k8s_node_name=\"$node_name\"}",
           "format": "table",
           "interval": "",
           "legendFormat": "",
@@ -499,6 +499,10 @@
                 "operation": "groupby"
               },
               "host_ip": {
+                "aggregations": [],
+                "operation": "groupby"
+              },
+              "k8s_pod_name": {
                 "aggregations": [],
                 "operation": "groupby"
               },
@@ -582,7 +586,7 @@
             "uid": "${datasource}"
           },
           "exemplar": false,
-          "expr": "sum(rate(node_cpu_seconds_total{mode!~\"idle|iowait|steal\", instance=\"$instance\", cluster=\"$cluster\"}[$__rate_interval]))",
+          "expr": "sum(rate(system_cpu_time_seconds_total{state!~\"idle|iowait|steal\", k8s_cluster_name=\"talosdev\", k8s_node_name=\"talosdev\"}[5m]))",
           "instant": true,
           "interval": "$resolution",
           "legendFormat": "",
@@ -711,7 +715,7 @@
             "uid": "${datasource}"
           },
           "exemplar": false,
-          "expr": "sum(node_memory_MemTotal_bytes{instance=\"$instance\", cluster=\"$cluster\"} - node_memory_MemAvailable_bytes{instance=\"$instance\", cluster=\"$cluster\"})",
+          "expr": "sum(system_memory_usage_bytes{state!~\"free|slab_reclaimable\", k8s_cluster_name=\"$cluster_name\", k8s_node_name=\"$node_name\"})",
           "instant": true,
           "interval": "",
           "legendFormat": "",
@@ -776,7 +780,7 @@
             "uid": "${datasource}"
           },
           "exemplar": true,
-          "expr": "machine_memory_bytes{node=\"$node\", cluster=\"$cluster\"}",
+          "expr": "sum(system_memory_usage_bytes{k8s_cluster_name=\"$cluster_name\", k8s_node_name=\"$node_name\"})",
           "instant": false,
           "interval": "",
           "legendFormat": "",
@@ -849,7 +853,7 @@
             "uid": "${datasource}"
           },
           "exemplar": true,
-          "expr": "node_time_seconds{instance=\"$instance\", cluster=\"$cluster\"} - node_boot_time_seconds{instance=\"$instance\", cluster=\"$cluster\"}",
+          "expr": "k8s_node_cpu_time_seconds_total{k8s_cluster_name=\"$cluster_name\", k8s_node_name=\"$node_name\"}",
           "instant": false,
           "interval": "",
           "legendFormat": "",
@@ -967,7 +971,7 @@
             "uid": "${datasource}"
           },
           "exemplar": true,
-          "expr": "avg(rate(node_cpu_seconds_total{instance=\"$instance\", cluster=\"$cluster\"}[$__rate_interval]) * 100) by (mode)",
+          "expr": "avg(sum by (cpu) (rate(system_cpu_time_seconds_total{state!~\"idle|iowait|steal\", k8s_node_name=\"$node_name\", k8s_cluster_name=\"$cluster_name\"}[$__rate_interval])))",
           "hide": false,
           "instant": false,
           "interval": "$resolution",
@@ -3860,15 +3864,15 @@
           "type": "prometheus",
           "uid": "${datasource}"
         },
-        "definition": "label_values(kube_node_info,cluster)",
+        "definition": "label_values(target_info,k8s_cluster_name)",
         "hide": 0,
         "includeAll": false,
         "multi": false,
-        "name": "cluster",
+        "name": "cluster_name",
         "options": [],
         "query": {
           "qryType": 1,
-          "query": "label_values(kube_node_info,cluster)",
+          "query": "label_values(target_info,k8s_cluster_name)",
           "refId": "PrometheusVariableQueryEditor-VariableQuery"
         },
         "refresh": 1,
@@ -3930,14 +3934,14 @@
           "type": "prometheus",
           "uid": "${datasource}"
         },
-        "definition": "label_values(kube_node_info{cluster=\"$cluster\"}, node)",
+        "definition": "label_values(k8s_node_condition_ready{k8s_cluster_name=\"$cluster_name\"}, k8s_node_name)",
         "hide": 0,
         "includeAll": false,
         "multi": false,
-        "name": "node",
+        "name": "node_name",
         "options": [],
         "query": {
-          "query": "label_values(kube_node_info{cluster=\"$cluster\"}, node)",
+          "query": "label_values(k8s_node_condition_ready{k8s_cluster_name=\"$cluster_name\"}, k8s_node_name)",
           "refId": "StandardVariableQuery"
         },
         "refresh": 2,
