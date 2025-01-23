@@ -652,6 +652,7 @@
           },
           "exemplar": true,
           "expr": "count(sum by (cpu)(system_cpu_time_seconds_total{k8s_cluster_name=\"$cluster_name\", k8s_node_name=\"$node_name\"}))"
+	}
       ],
       "title": "CPU Total",
       "type": "stat"
