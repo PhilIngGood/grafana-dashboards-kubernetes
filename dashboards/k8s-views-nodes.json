@@ -294,7 +294,7 @@
             "uid": "${datasource}"
           },
           "exemplar": true,
-          "expr": "sum(k8s_pod_phase{k8s_cluster_name=\"$cluster_name\", k8s_node_name=\"$node_name\"})",
+          "expr": "count(k8s_pod_phase{k8s_cluster_name=\"$cluster_name\", k8s_node_name=\"$node_name\"})",
           "interval": "",
           "legendFormat": "",
           "refId": "A"
@@ -1069,7 +1069,7 @@
             "uid": "${datasource}"
           },
           "exemplar": true,
-          "expr": "node_memory_MemTotal_bytes{instance=\"$instance\", cluster=\"$cluster\"} - node_memory_MemFree_bytes{instance=\"$instance\", cluster=\"$cluster\"} - (node_memory_Cached_bytes{instance=\"$instance\", cluster=\"$cluster\"} + node_memory_Buffers_bytes{instance=\"$instance\", cluster=\"$cluster\"})",
+          "expr": "sum(system_memory_usage_bytes{state!~\"free|slab_reclaimable\", k8s_cluster_name=\"$cluster_name\", k8s_node_name=\"$node_name\"})",
           "instant": false,
           "interval": "$resolution",
           "legendFormat": "RAM Used",
@@ -1081,7 +1081,7 @@
             "uid": "${datasource}"
           },
           "exemplar": true,
-          "expr": "node_memory_MemTotal_bytes{instance=\"$instance\", cluster=\"$cluster\"}",
+          "expr": "sum(system_memory_usage_bytes{k8s_cluster_name=\"$cluster_name\", k8s_node_name=\"$node_name\"})",
           "hide": false,
           "interval": "$resolution",
           "legendFormat": "RAM Total",
@@ -1093,7 +1093,7 @@
             "uid": "${datasource}"
           },
           "exemplar": true,
-          "expr": "node_memory_Cached_bytes{instance=\"$instance\", cluster=\"$cluster\"}",
+          "expr": "system_memory_usage_bytes{state=\"cached\", k8s_cluster_name=\"$cluster_name\", k8s_node_name=\"$node_name\"}",
           "hide": false,
           "interval": "$resolution",
           "legendFormat": "RAM Cache",
@@ -1105,7 +1105,7 @@
             "uid": "${datasource}"
           },
           "exemplar": true,
-          "expr": "node_memory_Buffers_bytes{instance=\"$instance\", cluster=\"$cluster\"}",
+          "expr": "system_memory_usage_bytes{state=\"buffered\", k8s_cluster_name=\"$cluster_name\", k8s_node_name=\"$node_name\"}}",
           "hide": false,
           "interval": "$resolution",
           "legendFormat": "RAM Buffer",
@@ -1117,35 +1117,11 @@
             "uid": "${datasource}"
           },
           "exemplar": true,
-          "expr": "node_memory_MemFree_bytes{instance=\"$instance\", cluster=\"$cluster\"}",
+          "expr": "system_memory_usage_bytes{state=\"free\", k8s_cluster_name=\"$cluster_name\", k8s_node_name=\"$node_name\"}",
           "hide": false,
           "interval": "$resolution",
           "legendFormat": "RAM Free",
           "refId": "E"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${datasource}"
-          },
-          "exemplar": true,
-          "expr": "node_memory_SwapTotal_bytes{instance=\"$instance\", cluster=\"$cluster\"} - node_memory_SwapFree_bytes{instance=\"$instance\", cluster=\"$cluster\"}",
-          "hide": false,
-          "interval": "$resolution",
-          "legendFormat": "SWAP Used",
-          "refId": "F"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${datasource}"
-          },
-          "exemplar": true,
-          "expr": "node_memory_SwapTotal_bytes{instance=\"$instance\", cluster=\"$cluster\"}",
-          "hide": false,
-          "interval": "$resolution",
-          "legendFormat": "SWAP Total",
-          "refId": "G"
         }
       ],
       "title": "Memory Usage",
