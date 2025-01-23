@@ -157,7 +157,7 @@
             "uid": "${datasource}"
           },
           "exemplar": false,
-          "expr": "avg(sum(rate(k8s_node_cpu_time_seconds_total{k8s_cluster_name=\"$cluster_name\", k8s_node_name=\"$node_name\"}[$__rate_interval])))",
+          "expr": "avg(sum by (cpu) (rate(system_cpu_time_seconds_total{state!~\"idle|iowait|steal\", k8s_cluster_name=\"$cluster_name\", k8s_node_name=\"$node_name\"}[$__rate_interval])))",
           "instant": true,
           "interval": "$resolution",
           "legendFormat": "",
@@ -651,11 +651,7 @@
             "uid": "${datasource}"
           },
           "exemplar": true,
-          "expr": "sum(machine_cpu_cores{node=\"$node\", cluster=\"$cluster\"})",
-          "interval": "$resolution",
-          "legendFormat": "",
-          "refId": "A"
-        }
+          "expr": "count(sum by (cpu)(system_cpu_time_seconds_total{k8s_cluster_name=\"$cluster_name\", k8s_node_name=\"$node_name\"}))"
       ],
       "title": "CPU Total",
       "type": "stat"
@@ -971,7 +967,7 @@
             "uid": "${datasource}"
           },
           "exemplar": true,
-          "expr": "avg(sum by (cpu) (rate(system_cpu_time_seconds_total{state!~\"idle|iowait|steal\", k8s_node_name=\"$node_name\", k8s_cluster_name=\"$cluster_name\"}[$__rate_interval])))",
+          "expr": "avg((rate(system_cpu_time_seconds_total{k8s_node_name=\"$node_name\", k8s_cluster_name=\"$cluster_name\"}[$__rate_interval])) * 100) by (state)",
           "hide": false,
           "instant": false,
           "interval": "$resolution",
