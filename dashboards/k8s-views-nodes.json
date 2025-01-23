@@ -1105,7 +1105,7 @@
             "uid": "${datasource}"
           },
           "exemplar": true,
-          "expr": "system_memory_usage_bytes{state=\"buffered\", k8s_cluster_name=\"$cluster_name\", k8s_node_name=\"$node_name\"}}",
+          "expr": "system_memory_usage_bytes{state=\"buffered\", k8s_cluster_name=\"$cluster_name\", k8s_node_name=\"$node_name\"}",
           "hide": false,
           "interval": "$resolution",
           "legendFormat": "RAM Buffer",
